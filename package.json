@@ -1,0 +1,17 @@
+{
+  "name": "project-kedy",
+  "version": "1.0.0",
+  "description": "Instagram Bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "author": "Kenpar",
+  "license": "GNU3",
+  "dependencies": {
+    "instagram-web-api": "^2.2.2",
+    "querystring": "^0.2.1",
+    "r2": "^2.0.1"
+  }
+}
