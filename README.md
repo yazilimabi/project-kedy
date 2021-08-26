@@ -25,9 +25,9 @@ breedMessage:  true
 
 ## How To Run
 1. Create an empty folder
-2. Open Command Prompt in folder and type `
+2. Open Command Prompt in folder and type 
 ``git clone https://github.com/xKenpar/project-kedy.git`` 
-3. After that, type `` node install`` to install necessary libraries (REQUIRES NODEJS AND NPM)
+3. After that, type `` npm install`` to install necessary libraries (REQUIRES NODEJS AND NPM)
 4. Copy the configuration file you made into ``src`` folder
 5. Lastly, type ``npm start`` to start the bot. (Make sure you created the config file)
 ## All Config Fields
