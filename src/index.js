@@ -33,7 +33,7 @@ async function main(){
   let postedCount = 0;
   while(count>postedCount||count<0){
     let res = await postNew();
-    if(res){
+    if(!res.error){
       postedCount++;
       if(count!=postedCount-1){
         await sleep(delay*1000);
@@ -41,16 +41,15 @@ async function main(){
     }
   }
   console.log("Program Ended Successfully!\nPosted \""+(postedCount+1)+"\" Images");
-  client.logout();
 }
 
 async function postNew() {
   try {
     var images = await loadImage();
 
-    if(!images){
-      console.log("Hata");
-      return;
+    if(images.error){
+      console.log("Error Occured In Getting Cat Image! Trying Again!");
+      return {error: error};;
     }
 
     var image = images[0];
@@ -60,13 +59,13 @@ async function postNew() {
 
     let caption = (breedMessage ?'Breed : ' + (breed ? breed.name : 'Unknown' ) + "\n" : "" );
     caption += (customCaption ? customCaption : "Coded By Kenpar\nVisit Kodrehberim.com For More");
-    client.uploadPhoto({ photo, caption: caption, post: 'feed' });
+    await client.uploadPhoto({ photo, caption: caption, post: 'feed' });
     console.log("Posted A New Photo");
-    return true;
+    return {error: null};
 
   } catch (error) {
-    console.log(error);
-    return false;
+    console.log("Error Occured In Sharing Cat Image! Trying Again!");
+    return {error: error};
   }
 }
 
