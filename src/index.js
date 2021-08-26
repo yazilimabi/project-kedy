@@ -1,7 +1,7 @@
 const Instagram = require('instagram-web-api')
 const querystring = require('querystring')
 const r2 = require('r2')
-const {
+let {
   username,
   password, 
   apiKey,
@@ -12,9 +12,12 @@ const {
   } = require('./config.js');
 const CAT_API_URL = " https://api.thecatapi.com/";
 
+let errorCount = 0;
+let postedCount = 0;
+
 if(!username||!password||!apiKey||!count||!delay){
   console.log("Necessary Configuration Fields Not Assigned");
-  return;
+  process.exit(1);
 }
 
 if(delay<10){
@@ -30,26 +33,55 @@ client
   })
 
 async function main(){
-  let postedCount = 0;
-  while(count>postedCount||count<0){
+
+  console.log("Project Kedy");
+  console.log("An Instagram Bot Automatically Shares Random Cat Images");
+  console.log("Contact kenpar@kodrehberim.com For Info Or Issues");
+
+  while(count > postedCount||count < 0)
+  {
+    if(!errorCount)
+    {
+      console.log("Attempting To Post...");
+    }
+    
     let res = await postNew();
-    if(!res.error){
+    if(!res.error)
+    {
+      errorCount = 0;
       postedCount++;
-      if(count!=postedCount-1){
+
+      if(count != postedCount-1)
+      {
         await sleep(delay*1000);
       }
+
+    }
+    else
+    {
+      errorCount++;
+    }
+    
+    if(errorCount==5){
+      console.log("Error Occured In Sharing Cat Image! Trying Again!");
+    }
+    else if(errorCount>10)
+    {
+      console.log("10 Image Sharing Attempt Has Been Failed! Stopping Program...");
+      return 0;
     }
   }
-  console.log("Program Ended Successfully!\nPosted \""+(postedCount+1)+"\" Images");
+  console.log("Program Ended Successfully!\nPosted \""+(postedCount)+"\" Images");
+
 }
 
 async function postNew() {
-  try {
+  try 
+  {
     var images = await loadImage();
 
     if(images.error){
-      console.log("Error Occured In Getting Cat Image! Trying Again!");
-      return {error: error};;
+      return {error: images.error};
     }
 
     var image = images[0];
@@ -60,11 +92,16 @@ async function postNew() {
     let caption = (breedMessage ?'Breed : ' + (breed ? breed.name : 'Unknown' ) + "\n" : "" );
     caption += (customCaption ? customCaption : "Coded By Kenpar\nVisit Kodrehberim.com For More");
     await client.uploadPhoto({ photo, caption: caption, post: 'feed' });
-    console.log("Posted A New Photo");
+    
+    var date_ob = new Date();
+
+    console.log(date_ob.getHours() + ":" + date_ob.getMinutes() + ":" +  date_ob.getSeconds() + 
+    " : Posted A New Photo \nCurrent Shared Image Count : " + (postedCount + 1));
     return {error: null};
 
-  } catch (error) {
-    console.log("Error Occured In Sharing Cat Image! Trying Again!");
+  } 
+  catch (error) 
+  {
     return {error: error};
   }
 }
@@ -75,16 +112,18 @@ async function loadImage() {
   };
   var query_params = {
     mime_types: "jpg,png",
-    size: "medium,small",
+    size: "big,medium,small",
     limit: 1
   };
   let queryString = querystring.stringify(query_params);
-  try {
+  try 
+  {
     let _url = CAT_API_URL + `v1/images/search?${queryString}`;
     var response = await r2.get(_url, { headers }).json;
-  } catch (e) {
-    console.log(e);
-    return false;
+  } 
+  catch (error) 
+  {
+    return {error: error};
   }
   return response;
 }
